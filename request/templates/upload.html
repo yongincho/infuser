@@ -1,0 +1,778 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> 
+  <title>Infuser - EXIF Analysis</title>
+  <link rel="icon" type="image/png" sizes="16x16" href='{% static "image/infusion.png" %}'>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3RRYV2GQ0G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3RRYV2GQ0G');
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <link rel="stylesheet" type="text/css" href='{% static "css/bootstrap-social.css" %}'>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlADeTZERYGauZGZDgJe2gXLoVXJcDpdI&callback=initMap&region=kr"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style id="compiled-css" type="text/css">
+
+  <script type="text/javascript" src='{% static "js/file-upload.js" %}'>
+  
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+
+.file-upload input[type='file'] {
+  display: none;
+}
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+
+body {
+  background: #00B4DB;
+  background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);
+  background: linear-gradient(to right, #0083B0, #00B4DB);
+  height: 100vh;
+}
+
+* { box-sizing: border-box; }
+.video-background {
+  background: #000;
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -99;
+}
+
+.video-foreground,
+.video-background video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  background-size:cover;
+}
+
+.rounded-lg {
+  border-radius: 1rem;
+}
+
+.custom-file-label.rounded-pill {
+  border-radius: 50rem;
+}
+
+.custom-file-label.rounded-pill::after {
+  border-radius: 0 50rem 50rem 0;
+}
+	    
+#modal-button {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#icon-button {
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+
+#icon-button-space {
+  margin-left: 5px;
+}
+
+.body {
+    background: #eee
+}
+
+.item .item-content {
+    padding: 30px 35px
+}
+
+.image-upload {
+    width: 100%;
+    height: 200px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    position: relative;
+    text-align: center;
+    background: #5e5e5e;
+    color: #666;
+    overflow: hidden
+}
+
+.item-wrapper form img {
+    margin-bottom: 20px;
+    width: auto;
+    height: auto;
+    max-height: 400px;
+    width: auto;
+    border-radius: 5px;
+    overflow: hidden
+}
+
+.image-upload img {
+    height: 100% !important;
+    width: auto !important;
+    border-radius: 0px;
+    margin: 0 auto
+}
+
+.image-upload i {
+    font-size: 6em;
+    color: #ccc
+}
+
+.image-upload input {
+    cursor: pointer;
+    opacity: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0
+}
+
+.item-wrapper input {
+    height: 200px;
+    line-height: 43px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px
+}
+
+#file-name {
+    font-size: 15px; 
+    color: white;
+}
+
+#upload-image {
+    color: white;
+}
+
+#map {
+    height: 300px;
+    width: 465px;
+}
+
+#donate-modal {
+    width: 167%; 
+    align-items: center;
+    transform: translate(-20%);   
+}
+
+.donate-align {
+    float: left;
+    padding: 20px;
+    text-align: center;
+}
+
+.donate-align2 {
+    float: left;
+    padding: 5px;
+}
+
+    /* EOS */
+  </style>
+
+  <script id="insert"></script>
+
+</head>
+<body>
+
+  <div class="video-background">
+    <div class="video-foreground">
+      <!-- <iframe src='{% static "background.mp4" %}' frameborder="0" allowfullscreen></iframe> -->
+      <video autoplay muted defaultMuted loop id="myVideo">
+        <source src='{% static "background.mp4" %}' type="video/mp4">
+      </video>
+    </div>
+  </div>
+  <section>
+  <div class="container p-5">
+    <!-- For demo purpose -->
+    <div class="row mb-5 text-center text-white">
+      <div class="col-lg-10 mx-auto">
+        <h1 class="display-4">Image EXIF Analysis </h1>
+        <p class="lead">View MeteData of Your Image</p>
+	<p class="lead">by myrinae</p>
+      </div>
+    </div>
+    <!-- End -->
+
+    <div class="row">
+      <div class="col-lg-5 mx-auto">
+	      <div class="p-5 bg-white shadow rounded-lg"><!--<img src="https://res.cloudinary.com/mhmd/image/upload/v1557366994/img_epm3iz.png" alt="" width="200" class="d-block mx-auto mb-4 rounded-pill">-->
+
+          <!-- File upload-->
+
+          <!--<h6 class="text-center mb-4 text-muted">
+            Upload Image for MeteData Analysis
+	  </h6>-->
+
+          <!--<div class="custom-file overflow-hidden rounded-pill mb-5">
+            <input id="customFile" type="file" class="custom-file-input rounded-pill">
+	    <label for="customFile" class="custom-file-label rounded-pill">Choose file</label>
+	  </div>-->
+	  <form id="FILE_FORM" action="javascript:upload();" enctype="multipart/form-data" method="post">
+	  <div class="item-wrapper one">
+            <div class="item">
+		    <!--<form data-validation="true" action="#" method="post" enctype="multipart/form-data">-->
+                <div class="item-inner">
+                  <div class="item-content">
+                    <div class="image-upload" id="dropZone"> <label style="cursor: pointer;" for="file_upload"> <img src="" alt="" class="uploaded-image">
+                      <div class="h-100">
+                        <div class="dplay-tbl">
+                          <div class="dplay-tbl-cell"> 
+		                    <i class="fa fa-cloud-upload" id="upload-image"></i>
+		                    <!--<h6 class="mt-10 mb-70">Drag and drop your image here or click</h6>-->
+			              </div>
+			              <span id="file-name">
+		                    Drag and drop your image here or click
+		                  </span>
+                        </div>
+                      </div>
+                    </label> 
+                    <input data-required="image" onclick="click_upload();" type="file" name="file" id="FILE_TAG" class="image-input" data-traget-resolution="image_resolution" value="">
+                    </div>
+                  </div>
+                  <!--item-content-->
+                </div>
+                <!--item-inner-->
+		<!--</form>-->
+            </div>
+            <!--item-->
+          </div>
+
+	  <!-- Button trigger modal -->
+	  <div id="modal-button">
+            <button type="submit" onclick="click_cancel();" class="btn btn-warning" data-target="#staticBackdrop">
+              Launch MetaData Analysis
+            </button>
+	  </div>
+	  </form>
+
+          <!-- Modal -->
+          <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">File Name</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div>
+                    <div id="map"></div>
+                    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlADeTZERYGauZGZDgJe2gXLoVXJcDpdI&callback=initMap&region=kr"></script>
+                  </div>
+		          <div>
+		            <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">Exif Data</th>
+                          <th scope="col">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody style="color: #222222;">
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            File Name
+                          </th>
+                          <td id="data01">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            File Type
+                          </th>
+                          <td id="data02">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            File Size
+                          </th>
+                          <td id="data03">...</td>
+                        </tr>  
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-industry" aria-hidden="true"></i>
+                            Manufacturer
+                          </th>
+                          <td id="data1">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                            Model
+                          </th>
+                          <td id="data2">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                            Image Height
+                          </th>
+                          <td id="data3">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                            Image Width
+                          </th>
+                          <td id="data4">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                            DateTime Original
+                          </th>
+                          <td id="data5">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                            DateTime Digitized
+                          </th>
+                          <td id="data6">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            SubsecTime Original
+                          </th>
+                          <td id="data7">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            SubsecTime Digitized
+                          </th>
+                          <td id="data8">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                            Last Modified
+                          </th>
+                          <td id="data9">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                            GPS Info: Latitude
+                          </th>
+                          <td id="data10">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                            GPS Info: Longitude
+                          </th>
+                          <td id="data11">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            Time Interval (GMT+)
+                          </th>
+                          <td id="data12">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera" aria-hidden="true"></i>
+                            Aperture Value
+                          </th>
+                          <td id="data13">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                            Brightness Value
+                          </th>
+                          <td id="data14">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-desktop" aria-hidden="true"></i>
+                            Color Space
+                          </th>
+                          <td id="data15">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Offset
+                          </th>
+                          <td id="data16">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Exposure Bias Value
+                          </th>
+                          <td id="data17">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Exposure Mode
+                          </th>
+                          <td id="data18">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Exposure Program
+                          </th>
+                          <td id="data19">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            Exposure Time
+                          </th>
+                          <td id="data20">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                            FNumber
+                          </th>
+                          <td id="data21">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-bolt" aria-hidden="true"></i>
+                            Flash
+                          </th>
+                          <td id="data22">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Focal Length
+                          </th>
+                          <td id="data23">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Focal Length In 35mm Film
+                          </th>
+                          <td id="data24">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            ISO Speed Ratings
+                          </th>
+                          <td id="data25">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera" aria-hidden="true"></i>
+                            Lens Make
+                          </th>
+                          <td id="data26">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera" aria-hidden="true"></i>
+                            Lens Model
+                          </th>
+                          <td id="data27">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera" aria-hidden="true"></i>
+                            Lens Specification
+                          </th>
+                          <td id="data28">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Metering Mode
+                          </th>
+                          <td id="data29">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            Orientation
+                          </th>
+                          <td id="data30">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            Resolution Unit
+                          </th>
+                          <td id="data31">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Scene Capture Type
+                          </th>
+                          <td id="data32">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Sensing Method
+                          </th>
+                          <td id="data33">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                            Shutter Speed Value
+                          </th>
+                          <td id="data34">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-mobile" aria-hidden="true"></i>
+                            Software
+                          </th>
+                          <td id="data35">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                            Subject Location
+                          </th>
+                          <td id="data36">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            White Balance
+                          </th>
+                          <td id="data37">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            XResolution
+                          </th>
+                          <td id="data38">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            YResolution
+                          </th>
+                          <td id="data39">...</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                            YCbCrPositioning
+                          </th>
+                          <td id="data40">...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+		          </div>
+		        <div>
+
+		        </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <!-- Button trigger modal -->
+                  <a data-toggle="modal" href="#staticBackdrop2" class="btn btn-primary">Donate</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" id="staticBackdrop2" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content" id="donate-modal">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">Thank you for your donation!</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="donate-align" class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div class="donate-align">
+                    <div class="donate-align2">
+                      <div class="donate-align2">
+                        <img src='{% static "image/BitCoin_QR.png" %}' width="150" height="190">
+                      </div>
+                    </div>
+
+                    <div> <i class="fa fa-btc" aria-hidden="true"></i> BitCoin </div>
+                  </div>
+                  <div class="donate-align">
+                    <div class="donate-align2">
+                      <div class="donate-align2">
+                        <img src='{% static "image/Ethereum_QR.png" %}' width="150" height="190"> 
+                      </div>
+                    </div>
+                    <div> <img src='{% static "image/ethereum.png" %}' width="15" height="15"> Ethereum </div>
+                  </div>
+                  <div class="donate-align">
+                    <div class="donate-align2">
+                      <div class="donate-align2">
+                        <img src='{% static "image/XRP_Address.png" %}' width="150" height="190">
+                      </div>
+                      <div class="donate-align2">
+                        <img src='{% static "image/XRP_Tag.png" %}' width="150" height="190">
+                      </div>
+                    </div>
+                    <div> <img src='{% static "image/ripple.png" %}' width="15" height="15"> Ripple XRP </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="#" type="button" class="btn btn-secondary" data-dismiss="modal">Close</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+	  <div id="icon-button">
+            <a class="btn btn-social-icon btn-github" id="icon-button-space" href="https://github.com/yongincho" style="color:white;">
+              <span class="fa fa-github"></span>
+            </a>
+
+            <a class="btn btn-social-icon btn-linkedin" id="icon-button-space" href="https://www.linkedin.com/in/jason-yong-in-cho-8a9173185/" style="color:white;">
+              <span class="fa fa-linkedin"></span>
+            </a>
+
+	    <a class="btn btn-social-icon btn-facebook" id="icon-button-space" href="https://www.facebook.com/profile.php?id=100010295176600" style="color:white;">
+              <span class="fa fa-facebook"></span>
+            </a>
+	  </div>
+          <!-- End -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <script type="text/javascript" src='{% static "js/upload.js" %}'>
+
+  <script type="text/javascript">//<![CDATA[//]]></script>
+
+  <!--
+  <script>
+
+    var uploadFiles = [];
+    var $drop = $("#dropZone");
+
+    $drop.on("dragenter", function(e) { //드래그 요소가 들어왔을떄
+      
+      $(this).addClass('drag-over');
+      }).on("dragleave", function(e) { //드래그 요소가 나갔을때
+
+      $(this).removeClass('drag-over');
+      }).on("dragover", function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }).on('drop', function(e) { //드래그한 항목을 떨어뜨렸을때
+      e.preventDefault();
+
+      $(this).removeClass('drag-over');
+
+      var files = e.originalEvent.dataTransfer.files; //드래그&드랍 항목
+
+      if (files.length > 0) {
+	var file = files[0];
+	var size = uploadFiles.push(file);
+	$('#file-name').text(file.name);
+	console.log(file);
+      }
+
+      //for(var i = 0; i < files.length; i++) {
+        //var file = files[i];
+        //var size = uploadFiles.push(file); //업로드 목록에 추가
+        //console.log(file);
+      //}
+
+    });
+  </script>
+  -->
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "t8a7qf4y"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
+
+    <script>
+      let allLines = []
+
+      window.addEventListener("message", (message) => {
+        if (message.data.console){
+          let insert = document.querySelector("#insert")
+          allLines.push(message.data.console.payload)
+          insert.innerHTML = allLines.join(";\r")
+
+          let result = eval.call(null, message.data.console.payload)
+          if (result !== undefined){
+            console.log(result)
+          }
+        }
+      })
+    </script>
+
+
+
+<div id="__dic_menulayer__" style="z-index: 99999998; padding: 0px; position: absolute; overflow: hidden; white-space: nowrap; left: 293px; top: 354px; width: 118px; display: none;"><a id="m_dic" href="javascript:void(0)" title="선택한 단어나 문장으로 사전 검색이나 번역을 합니다. (Google 번역)" style=""><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/dic.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_dic2_b" style="width: 2px;"><a id="m_dic2" href="javascript:void(0)" title="사전 검색 또는 번역 입력창을 엽니다. (Google 번역)" style=""><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/dic2.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_search_b" style="width: 2px;"><a id="m_search" href="javascript:void(0)" title="웹 검색을 합니다." style=""><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/search.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_search2_b" style="width: 2px; display: none;"><a id="m_search2" href="javascript:void(0)" title="웹 검색 입력창을 엽니다." style="display: none;"><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/search2.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_url_b" style="width: 2px; display: none;"><a id="m_url" href="javascript:void(0)" style="display: none;"><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/internet.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_conf_b" style="width: 2px; display: none;"><a id="m_conf" href="javascript:void(0)" title="옵션" style="display: none;"><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/configure.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_close_b" style="width: 2px; display: none;"><a id="m_close" href="javascript:void(0)" title="도구메뉴를 이 페이지에서 사용하지 않습니다." style="display: none;"><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/close.png" border="0"></a><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/blank.png" id="m_expand_b" style="width: 2px;"><a id="m_expand" href="javascript:void(0)" title="메뉴 확장하기" style=""><img src="chrome-extension://oiplkfaidhjklglajdpfehoagkmlcakh/images/forward.png" border="0"></a></div><canvas id="__gesture_canvas__" width="0" height="0" style="z-index: 100000000; position: fixed; background: transparent !important; top: 0px; left: 0px;"></canvas><span id="__gesture_preview__" style="z-index: 100000001; position: absolute; background: rgba(255, 255, 225, 0.85); margin: 0px; border: 1px solid black; white-space: nowrap; display: none;"></span></body><style>#__dic_layer__ img{ width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none; display: inline; opacity:1;}#__dic_menulayer__ img{ width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none; display: inline; opacity:1;}#__dic_waitlayer__ img{ width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none; display: inline; opacity:1;}#__dic_layer__ a{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none;display: inline; background-color:transparent}#__dic_layer__ a:link{ color:#0860A8; }#__dic_layer__ a:visited{ color:#0860A8; }#__dic_layer__ a:active{ color:#0860A8;}#__dic_layer__ a:hover{ color:#0860A8; text-decoration:underline; }#__dic_layer__ div{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none;width:auto;height:auto; }#__dic_menulayer__ a{ display: inline; background-color:transparent}#__dic_layer__ tr{ width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none;font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__dic_layer__ td{ width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none;font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__table_source_open__ { width:auto;height:auto;margin:0px;padding:0px;background-color:transparent;border-color:transparent;border-width:0px;text-shadow:none; }#__dic_source_data__ div{ width:99%; }#__dic_layer__ p{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__dic_layer__ b{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__dic_layer__ ul{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none;width:auto;height:auto; padding:0px 0px 0px 4px; margin:0px; list-style-type: disc;}#__dic_layer__ li{ font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none;width:auto;height:auto; padding:0px 0px 0xp 8px; margin:0px; list-style-type: decimal; list-style-position: outside;}#__dic_layer__ span{font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__dic_layer__ option{font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none; }#__dic_layer__ select{font-size:10pt;color:black; font-family:Arial, Helvetica, sans-serif; text-align: left; letter-spacing:normal;line-height:normal;font-weight: normal;text-shadow:none;background-color:white;width:145px;height: 20px;display:inline-block;border:1px solid transparent;padding: 0px;margin:2px 0px 2px 0px;}</style></html>
